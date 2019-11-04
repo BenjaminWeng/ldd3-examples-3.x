@@ -30,6 +30,8 @@
 #include <asm/atomic.h>
 #include <linux/list.h>
 
+#include <linux/sched/signal.h>
+
 #include "scull.h"        /* local definitions */
 
 static dev_t scull_a_firstdev;  /* Where our range begins */

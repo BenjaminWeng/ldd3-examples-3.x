@@ -331,7 +331,7 @@ ssize_t scull_read(struct file *filp, char __user *buf, size_t count,
 	if (count > quantum - q_pos)
 		count = quantum - q_pos;
 
-	if (copy_to_user(buf, dptr->data[s_pos] + q_pos, count)) {
+	if (raw_copy_to_user(buf, dptr->data[s_pos] + q_pos, count)) {
 		retval = -EFAULT;
 		goto out;
 	}
@@ -380,7 +380,7 @@ ssize_t scull_write(struct file *filp, const char __user *buf, size_t count,
 	if (count > quantum - q_pos)
 		count = quantum - q_pos;
 
-	if (copy_from_user(dptr->data[s_pos]+q_pos, buf, count)) {
+	if (raw_copy_from_user(dptr->data[s_pos]+q_pos, buf, count)) {
 		retval = -EFAULT;
 		goto out;
 	}

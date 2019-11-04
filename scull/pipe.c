@@ -32,6 +32,12 @@
 
 #include "scull.h"		/* local definitions */
 
+#include <linux/version.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
+#include <linux/sched/signal.h>
+#endif
+
+
 struct scull_pipe {
         wait_queue_head_t inq, outq;       /* read and write queues */
         char *buffer, *end;                /* begin of buf, end of buf */
@@ -141,7 +147,7 @@ static ssize_t scull_p_read (struct file *filp, char __user *buf, size_t count,
 		count = min(count, (size_t)(dev->wp - dev->rp));
 	else /* the write pointer has wrapped, return data up to dev->end */
 		count = min(count, (size_t)(dev->end - dev->rp));
-	if (copy_to_user(buf, dev->rp, count)) {
+	if (raw_copy_to_user(buf, dev->rp, count)) {
 		mutex_unlock (&dev->mutex);
 		return -EFAULT;
 	}
@@ -208,7 +214,7 @@ static ssize_t scull_p_write(struct file *filp, const char __user *buf, size_t c
 	else /* the write pointer has wrapped, fill up to rp-1 */
 		count = min(count, (size_t)(dev->rp - dev->wp - 1));
 	PDEBUG("Going to accept %li bytes to %p from %p\n", (long)count, dev->wp, buf);
-	if (copy_from_user(dev->wp, buf, count)) {
+	if (raw_copy_from_user(dev->wp, buf, count)) {
 		mutex_unlock (&dev->mutex);
 		return -EFAULT;
 	}
